@@ -34,7 +34,8 @@ describe('Multiline Imports Formatting', () => {
     
     // Expect single-line format
     expect(formatted).toContain('import { a, b, c }');
-    expect(formatted).not.toContain('import {');
+    // Check that it doesn't have a line break after the opening brace
+    expect(formatted).not.toContain('import {\n');
     expect(formatted).not.toContain('  a,');
   });
   
@@ -50,7 +51,8 @@ describe('Multiline Imports Formatting', () => {
     
     // Expect single-line format since there's only one import and minItemsForMultiline is 2
     expect(formatted).toContain('import { a }');
-    expect(formatted).not.toContain('import {');
+    // Check that it doesn't have a line break after the opening brace
+    expect(formatted).not.toContain('import {\n');
     expect(formatted).not.toContain('  a,');
   });
 });
