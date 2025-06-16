@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-multiline",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Prettier plugin for multiline formatting and safe sorting",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "typescript",
     "javascript"
   ],
-  "author": "",
+  "author": "Eric Wheeler <prettier-plugin-multiline@z.ewheeler.org>",
   "license": "MIT",
   "peerDependencies": {
     "prettier": "^2.0.0 || ^3.0.0"
