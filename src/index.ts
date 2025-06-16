@@ -104,17 +104,28 @@ const prettierPluginMultiline: Plugin = {
                 });
               }
               
+              // For multiline imports with specific indentation pattern
+              // Get the indentation string based on tabWidth and useTabs
+              const indentStr = options.useTabs ? '\t' : ' '.repeat(options.tabWidth || 2);
+              const doubleIndentStr = indentStr + indentStr;
+              const singleIndentStr = indentStr;
+              
+              // Get all named import specifiers as strings
+              const specifierStrings = namedSpecifiers.map((_: any, i: number) => {
+                const specifier = path.call(print, 'specifiers', node.specifiers.indexOf(namedSpecifiers[i]));
+                return specifier;
+              });
+              
+              // Construct the multiline import string with the desired indentation pattern
+              const namedImportsBlock = specifierStrings
+                .map((s: any) => doubleIndentStr + s + ',')
+                .join('\n');
+              
+              // Add the import parts with the correct indentation
               importParts.push(
-                '{',
-                indent([
-                  hardline,
-                  join([',', hardline], namedSpecifiers.map((_: any, i: number) =>
-                    path.call(print, 'specifiers', node.specifiers.indexOf(namedSpecifiers[i]))
-                  ))
-                ]),
-                ',', // Add trailing comma
-                hardline,
-                '}'
+                '{\n' +
+                namedImportsBlock +
+                '\n' + singleIndentStr + '}'
               );
             }
             
