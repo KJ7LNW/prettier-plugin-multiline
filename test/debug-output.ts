@@ -1,14 +1,9 @@
 import * as prettier from 'prettier';
 import prettierPluginMultiline from '../src/index';
-import { MultilineImportsTransform } from '../src/transforms/imports/multiline';
 import { ASTNode } from '../src/types';
 
 // Create a custom printer function that respects our multiline settings
 function customPrinter(ast: any, options: any): string {
-  // Apply our transform to the AST
-  const transform = new MultilineImportsTransform();
-  transform.transform(ast, options);
-  
   // Process the AST to generate the formatted output
   let output = '';
   
@@ -17,7 +12,7 @@ function customPrinter(ast: any, options: any): string {
       const specifiers = node.specifiers.map((s: any) => s.local.name);
       const source = node.source.value;
       
-      if (node.multiline) {
+      if (options.multilineImports && specifiers.length >= (options.minItemsForMultiline || 1)) {
         // Format with multiline
         output += `import {\n  ${specifiers.join(',\n  ')},\n} from "${source}";\n`;
       } else {

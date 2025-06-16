@@ -28,7 +28,13 @@ export const pluginOptions: SupportOptions = {
   minItemsForMultiline: {
     type: 'int',
     category: 'Global',
-    default: 3,
+    default: 1,
     description: 'Minimum number of items to trigger multiline formatting.',
+  },
+  debug: {
+    type: 'boolean',
+    category: 'Global',
+    default: false,
+    description: 'Enable debug output for the plugin.',
   },
 };
