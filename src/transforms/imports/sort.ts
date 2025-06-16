@@ -1,3 +1,16 @@
-// Transform to sort import specifiers within a single import declaration
-// Note: This is specifically for sorting import specifiers (e.g., import {b, a} -> import {a, b}),
-// which is a safe operation that doesn't affect program behavior
+import { AST } from 'prettier';
+import { BaseTransform } from '../base-transform';
+import { PrettierPluginOptions, ASTNode } from '../../types';
+
+export class SortImportsTransform extends BaseTransform {
+  name = 'sort-imports';
+  optionKey = 'sortImports';
+  languages = ['typescript', 'babel', 'babel-ts', 'flow', 'babel-flow'];
+
+  transform(ast: AST, options: PrettierPluginOptions): void {
+    // This will be implemented later
+    // For now, just a stub to support our imports
+  }
+}
+
+export default new SortImportsTransform();

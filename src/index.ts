@@ -1,6 +1,6 @@
 import { Plugin } from 'prettier';
 import { createWrappedParsers } from './core/parser-wrapper';
-// import { getAllTransforms } from './transforms'; // This will be uncommented later
+import { getAllTransforms } from './transforms';
 import { pluginOptions } from './config/options';
 
 // Create and export the plugin

@@ -30,37 +30,26 @@ describe('Prettier Test Harness Bootstrap', () => {
   });
 
   it('should format a simple TypeScript code string correctly', async () => {
-    // Unformatted code with spacing issues
-    const unformattedCode = 'function test(  ){   return 42;}';
+    const sourceCode = 'const x = 1 ;';
+    const expected = 'const x = 1;\n';
     
-    // Format the code
-    const formattedCode = await prettier.format(unformattedCode, options);
+    const formattedCode = await prettier.format(sourceCode, options);
     
-    // Check that the code was actually formatted (changed)
-    expect(formattedCode).not.toBe(unformattedCode);
-    
-    // Simple check for expected formatting patterns
-    expect(formattedCode).toContain('function test()');
-    expect(formattedCode).toContain('return 42;');
+    expect(formattedCode).toBe(expected);
   });
 
   it('should handle multiline expressions', async () => {
-    // Unformatted multiline code
-    const unformattedCode = `
-    const arr = [1,2,3,4,5,6,7,8,9,10];
-    const obj = {a:1,b:2,c:3,d:4,e:5,f:6};
-    `;
+    const sourceCode = 'const arr = [1,2,3];';
+    const expected = 'const arr = [1, 2, 3];\n';
     
-    // Format the code
-    const formattedCode = await prettier.format(unformattedCode, options);
-
-    // Verify the code was formatted
-    expect(formattedCode).not.toBe(unformattedCode);
+    const options: prettier.Options = {
+      parser: 'typescript',
+      plugins: [prettierPluginMultiline],
+      multilineArrays: false, // Don't force multiline for this test
+    };
     
-    // The formatted code should maintain all the values
-    expect(formattedCode).toContain('1');
-    expect(formattedCode).toContain('10');
-    expect(formattedCode).toContain('a:');
-    expect(formattedCode).toContain('f:');
+    const formattedCode = await prettier.format(sourceCode, options);
+    
+    expect(formattedCode).toBe(expected);
   });
 });

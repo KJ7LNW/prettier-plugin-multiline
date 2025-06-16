@@ -14,6 +14,7 @@ export interface ASTTransform {
   optionKey: keyof PrettierPluginOptions;
   languages: string[];
   transform(ast: AST, options: PrettierPluginOptions): void;
+  shouldRun(options: PrettierPluginOptions): boolean;
 }
 
 export interface ASTNode {
