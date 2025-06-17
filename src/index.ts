@@ -3,6 +3,10 @@ import { builders } from 'prettier/doc';
 import { createWrappedParsers } from './core/parser-wrapper';
 import { getAllTransforms } from './transforms';
 import { pluginOptions } from './config/options';
+import { PrintHookRegistry } from './hooks/registry';
+
+// Import hooks
+import './hooks/import-multiline';
 
 // Import the doc builders from prettier
 const { group, indent, hardline, join, line } = builders;
@@ -34,192 +38,27 @@ const prettierPluginMultiline: Plugin = {
         
         debug(options, 'Node type:', node.type);
         
-        // Handle Program node by printing all its children
-        if (node.type === 'Program') {
-          debug(options, 'Processing Program node');
-          
-          // Print all the body elements
-          return join(hardline, path.map(print, 'body'));
-        }
+        // Check if there's a registered hook for this node type
+        const hook = PrintHookRegistry.getHook(node.type);
         
-        // Handle ImportDeclaration nodes
-        if (node.type === 'ImportDeclaration') {
-          debug(options, 'Processing ImportDeclaration', {
-            multilineImports: options.multilineImports,
-            sortImports: options.sortImports,
-            minItemsForMultiline: options.minItemsForMultiline,
-            specifiersCount: node.specifiers?.length,
-            hasSortedImports: node.hasSortedImports
-          });
+        // If a hook exists, use it
+        if (hook) {
+          debug(options, `Using registered hook for ${node.type}`);
           
-          // Get all specifiers
-          const defaultSpecifiers = node.specifiers.filter(
-            (specifier: any) => specifier.type === 'ImportDefaultSpecifier'
-          );
+          // Call the hook's print function
+          const result = hook.print(path, options, print);
           
-          const namespaceSpecifiers = node.specifiers.filter(
-            (specifier: any) => specifier.type === 'ImportNamespaceSpecifier'
-          );
-          
-          const namedSpecifiers = node.specifiers.filter(
-            (specifier: any) => specifier.type === 'ImportSpecifier'
-          );
-          
-          // Check if multilineImports option is enabled
-          if (options.multilineImports === true &&
-              namedSpecifiers.length >= (options.minItemsForMultiline || 1)) {
-            debug(options, 'Applying multiline formatting');
-            
-            // Build the import parts
-            const importParts: any[] = ['import '];
-            
-            // Add default import if present
-            if (defaultSpecifiers.length > 0) {
-              importParts.push(path.call(print, 'specifiers', node.specifiers.indexOf(defaultSpecifiers[0])));
-              
-              if (namespaceSpecifiers.length > 0 || namedSpecifiers.length > 0) {
-                importParts.push(', ');
-              }
-            }
-            
-            // Add namespace import if present
-            if (namespaceSpecifiers.length > 0) {
-              importParts.push(path.call(print, 'specifiers', node.specifiers.indexOf(namespaceSpecifiers[0])));
-              
-              if (namedSpecifiers.length > 0) {
-                importParts.push(', ');
-              }
-            }
-            
-            // Add named imports if present
-            if (namedSpecifiers.length > 0) {
-              // For multiline imports, we need to sort the specifiers if sortImports is enabled
-              if (options.sortImports) {
-                // Sort the named specifiers alphabetically and case-insensitively
-                namedSpecifiers.sort((a: any, b: any) => {
-                  const nameA = a.imported?.name || a.local?.name || '';
-                  const nameB = b.imported?.name || b.local?.name || '';
-                  
-                  return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
-                });
-              }
-              
-              // For multiline imports with specific indentation pattern
-              // Get the indentation string based on tabWidth and useTabs
-              const indentStr = options.useTabs ? '\t' : ' '.repeat(options.tabWidth || 2);
-              const doubleIndentStr = indentStr + indentStr;
-              const singleIndentStr = indentStr;
-              
-              // Get all named import specifiers as strings
-              const specifierStrings = namedSpecifiers.map((_: any, i: number) => {
-                const specifier = path.call(print, 'specifiers', node.specifiers.indexOf(namedSpecifiers[i]));
-                return specifier;
-              });
-              
-              // Construct the multiline import string with the desired indentation pattern
-              const namedImportsBlock = specifierStrings
-                .map((s: any) => doubleIndentStr + s + ',')
-                .join('\n');
-              
-              // Add the import parts with the correct indentation
-              importParts.push(
-                '{\n' +
-                namedImportsBlock +
-                '\n' + singleIndentStr + '}'
-              );
-            }
-            
-            // Add source
-            importParts.push(' from ', path.call(print, 'source'), ';');
-            
-            return group(importParts);
-          } else {
-            // For single-line imports, build the parts
-            const importParts: any[] = ['import '];
-            
-            // Add default import if present
-            if (defaultSpecifiers.length > 0) {
-              importParts.push(path.call(print, 'specifiers', node.specifiers.indexOf(defaultSpecifiers[0])));
-              
-              if (namespaceSpecifiers.length > 0 || namedSpecifiers.length > 0) {
-                importParts.push(', ');
-              }
-            }
-            
-            // Add namespace import if present
-            if (namespaceSpecifiers.length > 0) {
-              importParts.push(path.call(print, 'specifiers', node.specifiers.indexOf(namespaceSpecifiers[0])));
-              
-              if (namedSpecifiers.length > 0) {
-                importParts.push(', ');
-              }
-            }
-            
-            // Add named imports if present
-            if (namedSpecifiers.length > 0) {
-              // For single-line imports, we need to sort the specifiers if sortImports is enabled
-              if (options.sortImports) {
-                // Sort the named specifiers alphabetically and case-insensitively
-                namedSpecifiers.sort((a: any, b: any) => {
-                  const nameA = a.imported?.name || a.local?.name || '';
-                  const nameB = b.imported?.name || b.local?.name || '';
-                  
-                  return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
-                });
-              }
-              
-              importParts.push('{ ');
-              
-              importParts.push(
-                join(', ', namedSpecifiers.map((_: any, i: number) =>
-                  path.call(print, 'specifiers', node.specifiers.indexOf(namedSpecifiers[i]))
-                ))
-              );
-              
-              importParts.push(' }');
-            }
-            
-            // Add source
-            importParts.push(' from ', path.call(print, 'source'), ';');
-            
-            return group(importParts);
+          // If the hook returns a non-null result, use it
+          if (result !== null) {
+            return result;
           }
-        }
-        
-        // Handle ImportSpecifier nodes
-        if (node.type === 'ImportSpecifier') {
-          debug(options, 'Processing ImportSpecifier node');
           
-          // Print the local name of the import specifier
-          return node.local.name;
-        }
-        
-        // Handle ImportDefaultSpecifier nodes
-        if (node.type === 'ImportDefaultSpecifier') {
-          debug(options, 'Processing ImportDefaultSpecifier node');
-          
-          // Print the local name of the default import specifier
-          return node.local.name;
-        }
-        
-        // Handle ImportNamespaceSpecifier nodes
-        if (node.type === 'ImportNamespaceSpecifier') {
-          debug(options, 'Processing ImportNamespaceSpecifier node');
-          
-          // Print the namespace import specifier
-          return `* as ${node.local.name}`;
-        }
-        
-        // Handle Literal nodes (for the source of import declarations)
-        if (node.type === 'Literal') {
-          debug(options, 'Processing Literal node');
-          
-          // Print the string literal with quotes
-          return `"${node.value}"`;
+          // Otherwise, fall back to the default printer
+          debug(options, `Hook returned null, falling back to default printer`);
         }
         
         // For other nodes, return an empty string to defer to Prettier's default printer
-        debug(options, `Returning empty string for ${node.type} node`);
+        debug(options, `Returning empty string for ${node.type} node to use default printer`);
         
         return '';
       }
