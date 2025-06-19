@@ -2,6 +2,9 @@
 
 A Prettier plugin that formats imports, arrays, and objects on multiple lines to minimize merge conflicts in collaborative development environments.
 
+[![npm version](https://img.shields.io/npm/v/prettier-plugin-multiline.svg)](https://www.npmjs.com/package/prettier-plugin-multiline)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Why Multi-line Formatting Matters
 
 ### The Problem: Merge Conflicts in Collaborative Development
@@ -87,6 +90,8 @@ npm install --save-dev prettier-plugin-multiline
 
 ## Usage
 
+### Configuration File
+
 Add the plugin to your Prettier configuration:
 
 ```json
@@ -94,8 +99,28 @@ Add the plugin to your Prettier configuration:
   "plugins": ["prettier-plugin-multiline"],
   "multilineImports": true,
   "multilineArrays": true,
-  "multilineObjects": true
+  "multilineObjects": true,
+  "sortImports": true,
+  "minItemsForMultiline": 2
 }
+```
+
+### Command Line
+
+You can also use the plugin directly from the command line:
+
+```bash
+# Format with multiline imports
+npx prettier --plugin=prettier-plugin-multiline --parser=typescript --multiline-imports file.ts
+
+# Format with sorted imports
+npx prettier --plugin=prettier-plugin-multiline --parser=typescript --sort-imports file.ts
+
+# Format with both multiline and sorted imports
+npx prettier --plugin=prettier-plugin-multiline --parser=typescript --multiline-imports --sort-imports file.ts
+
+# Set minimum items for multiline formatting
+npx prettier --plugin=prettier-plugin-multiline --parser=typescript --multiline-imports --min-items-for-multiline=2 file.ts
 ```
 
 ## Configuration Options
