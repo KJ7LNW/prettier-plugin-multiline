@@ -7,6 +7,6 @@ export default defineConfig({
       dir: './.vitest-cache'
     },
     // Exclude compiled tests in dist and tests in the deleteme directory
-    exclude: ['**/node_modules/**', '**/deleteme/**', '**/dist/**']
+    exclude: ['**/node_modules/**', '**/dist/**']
   }
 });
