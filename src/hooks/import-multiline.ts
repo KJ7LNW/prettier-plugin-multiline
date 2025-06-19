@@ -6,18 +6,6 @@ import { getOriginalPrinter } from '../core/printer-access';
 // Import the doc builders from prettier
 const { group, indent, hardline, join, line } = builders;
 
-/**
- * Hook for handling Program nodes.
- * This hook is responsible for formatting the program body.
- */
-const ProgramHook: PrinterHook = {
-  nodeType: 'Program',
-  optionKey: 'multilineImports', // Reusing this option since it's always enabled
-  print: (path, options, print, originalPrinter) => {
-    // Print all the body elements
-    return join(hardline, path.map(print, 'body'));
-  }
-};
 
 /**
  * Hook for handling ImportDeclaration nodes.
@@ -219,32 +207,16 @@ const ImportNamespaceSpecifierHook: PrinterHook = {
   }
 };
 
-/**
- * Hook for handling Literal nodes (for the source of import declarations).
- */
-const LiteralHook: PrinterHook = {
-  nodeType: 'Literal',
-  optionKey: 'multilineImports', // Reusing this option since it's always enabled
-  print: (path, options, print, originalPrinter) => {
-    const node = path.getValue();
-    return `"${node.value}"`;
-  }
-};
-
 // Register all the hooks with the registry
-PrintHookRegistry.register(ProgramHook);
 PrintHookRegistry.register(ImportDeclarationHook);
 PrintHookRegistry.register(ImportSpecifierHook);
 PrintHookRegistry.register(ImportDefaultSpecifierHook);
 PrintHookRegistry.register(ImportNamespaceSpecifierHook);
-PrintHookRegistry.register(LiteralHook);
 
 // Export the hooks for testing
 export {
-  ProgramHook,
   ImportDeclarationHook,
   ImportSpecifierHook,
   ImportDefaultSpecifierHook,
-  ImportNamespaceSpecifierHook,
-  LiteralHook
+  ImportNamespaceSpecifierHook
 };
