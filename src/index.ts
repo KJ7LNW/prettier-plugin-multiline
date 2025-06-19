@@ -8,7 +8,6 @@ import { getOriginalPrinter } from './core/printer-access';
 
 // Import hooks
 import './hooks/import-multiline';
-import './hooks/variable-declaration';
 
 // Import the doc builders from prettier
 const { group, indent, hardline, join, line } = builders;
