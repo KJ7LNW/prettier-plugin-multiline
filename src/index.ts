@@ -1,7 +1,5 @@
 import { Plugin } from 'prettier';
 import { builders } from 'prettier/doc';
-import { createWrappedParsers } from './core/parser-wrapper';
-import { getAllTransforms } from './transforms';
 import { pluginOptions } from './config/options';
 import { PrintHookRegistry } from './hooks/registry';
 import { getOriginalPrinter } from './core/printer-access';
@@ -18,13 +16,23 @@ setDebugState(false);
 
 // Create and export the plugin
 const prettierPluginMultiline: Plugin = {
-  parsers: createWrappedParsers([
-    'typescript',
-    'babel',
-    'babel-ts',
-    'flow',
-    'babel-flow'
-  ]),
+  parsers: {
+    typescript: {
+      ...require("prettier/parser-typescript").parsers.typescript
+    },
+    babel: {
+      ...require("prettier/parser-babel").parsers.babel
+    },
+    "babel-ts": {
+      ...require("prettier/parser-babel").parsers["babel-ts"]
+    },
+    flow: {
+      ...require("prettier/parser-flow").parsers.flow
+    },
+    "babel-flow": {
+      ...require("prettier/parser-babel").parsers["babel-flow"]
+    }
+  },
   options: pluginOptions,
   printers: {
     estree: {
