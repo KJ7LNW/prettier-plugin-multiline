@@ -18,6 +18,12 @@ export class PrintHookRegistry {
     this.hooks.clear();
   }
 
+  public static unregister(nodeType: string) {
+    if (this.hooks.has(nodeType)) {
+      this.hooks.delete(nodeType);
+    }
+  }
+
   public static validateOptions(options: Record<string, any>): string[] {
     const errors: string[] = [];
     const enabledHooks: PrinterHook[] = [];

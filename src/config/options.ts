@@ -37,4 +37,10 @@ export const pluginOptions: SupportOptions = {
     default: false,
     description: 'Enable debug output for the plugin.',
   },
+  hookVariableDeclarations: {
+    type: 'boolean',
+    category: 'Global',
+    default: false,
+    description: 'Add a hook marker before variable declarations.',
+  },
 };
